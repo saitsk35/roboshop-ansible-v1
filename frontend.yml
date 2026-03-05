@@ -24,5 +24,3 @@
       ansible.builtin.dnf:
         name: '@nginx:1.24'
         state: present
-
-# fkebgebke wfnekbfkefeabkfbekgesvegrvegewgewnkgewwfnafjehbvferbgfefwqq fjwebvejfbqfwwjf
