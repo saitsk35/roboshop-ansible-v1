@@ -34,16 +34,16 @@
         name: '@nodejs:20'
         state: present
 
-    - name: Add roboshop application user
+    - name: Add Roboshop Application User
       ansible.builtin.user:
         name: roboshop
 
-    - name: Remove app directory
+    - name: Remove default app directory
       ansible.builtin.file:
         path: /app
         state: absent
 
-    - name: Create app directory
+    - name: Create default app directory
       ansible.builtin.file:
         path: /app
         state: directory
@@ -51,7 +51,7 @@
     - name: Download and extract app content
       ansible.builtin.unarchive:
         src: https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip
-        dest: /app
+        dest: /usr/share/nginx/html
         remote_src: yes
 
     - name: Install packages based on package.json.
@@ -63,18 +63,7 @@
         src: mongo.repo
         dest: /etc/yum.repos.d/mongo.repo
 
-    - name: Install Mongo Client
-      ansible.builtin.dnf:
-        name: mongodb-mongosh
-        state: present
-
-#    - name: Load Master Data
-#      community.mongodb.mongodb_shell:
-#        file: "/app/db/master-data.js"
-#        login_host: mongodb-dev.saikrishna.shop
-#        idempotent: yes
-
-    - name: Install Monngodb Shell
+    - name: Install MognoDB Shell
       ansible.builtin.dnf:
         name: mongodb-mongosh
         state: present
@@ -82,10 +71,10 @@
     - name: Load Master Data
       ansible.builtin.shell: mongosh --host mongodb-dev.saikrishna.shop </app/db/master-data.js
 
-    - name: Copy Catalogue Service File
+    - name: Copy catalogue service file
       ansible.builtin.copy:
-        src: catalogue.service
-        dest: /etc/systemd/system/catalogue.service
+       src: catalogue.service
+       dest: /etc/systemd/system/catalogue.service
 
     - name: Start Catalogue service
       ansible.builtin.systemd_service:
