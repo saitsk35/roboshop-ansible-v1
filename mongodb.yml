@@ -16,12 +16,24 @@
         src: mongo.repo
         dest: /etc/yum.repos.d/mongo.repo
 
+    - name: Replace Conf
+      ansible.builtin.replace:
+        path: /etc/mongod.conf
+        regexp: '127.0.0.1'
+        replace: '0.0.0.0'
+
     - name: Install MongoDB
       ansible.builtin.dnf:
         name: mongodb-org
         state: present
 
-    - name: Install MongoDB
+    - name: Start Mongodb service
+      ansible.builtin.systemd_service:
+        state: restarted
+        name: nginx
+        enabled: true
+
+    - name: Replace Conf
       ansible.builtin.replace:
         path: /etc/mongod.conf
         regexp: '127.0.0.1'
@@ -30,5 +42,5 @@
     - name: Start Mongodb service
       ansible.builtin.systemd_service:
         state: restarted
-        name: mongod
+        name: nginx
         enabled: true
