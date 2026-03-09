@@ -92,4 +92,4 @@
         state: restarted
         name: catalogue
         enabled: true
-        demon_reload: true
+        daemon_reload: true
