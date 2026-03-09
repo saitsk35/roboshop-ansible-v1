@@ -85,3 +85,4 @@
         name: nginx
         enabled: true
         demon_reload: true
+
