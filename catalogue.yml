@@ -68,11 +68,19 @@
         name: mongodb-mongosh
         state: present
 
+#    - name: Load Master Data
+#      community.mongodb.mongodb_shell:
+#        file: "/app/db/master-data.js"
+#        login_host: mongodb-dev.saikrishna.shop
+#        idempotent: yes
+
+    - name: Install Monngodb Shell
+      ansible.builtin.dnf:
+        name: mongodb-mongosh
+        state: present
+
     - name: Load Master Data
-      community.mongodb.mongodb_shell:
-        file: "/app/db/master-data.js"
-        login_host: mongodb-dev.saikrishna.shop
-        idempotent: yes
+      ansible.builtin.shell: mongosh --host mongodb-dev.saikrishna.shop </app/db/master-data.js
 
     - name: Copy Catalogue Service File
       ansible.builtin.copy:
@@ -85,4 +93,3 @@
         name: nginx
         enabled: true
         demon_reload: true
-
