@@ -7,11 +7,11 @@
 #systemctl enable mongod
 #systemctl restart mongod
 
-- name: Mongodb Setup
+- name: MongoDB Setup
   hosts: all
   become: true
   tasks:
-    - name: Copy Mongodb repo file
+    - name: Copy MongoDB repo file
       ansible.builtin.copy:
         src: mongo.repo
         dest: /etc/yum.repos.d/mongo.repo
@@ -21,14 +21,14 @@
         name: mongodb-org
         state: present
 
-    - name: Install MongoDB
+    - name: Replace Conf
       ansible.builtin.replace:
         path: /etc/mongod.conf
-        regexp: '127.0.0.0'
+        regexp: '127.0.0.1'
         replace: '0.0.0.0'
 
-    - name: Start MongoDB service
+    - name: Start Mongodb service
       ansible.builtin.systemd_service:
         state: restarted
-        name: mongod
+        name: Mongod
         enabled: true
