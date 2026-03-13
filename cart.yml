@@ -4,24 +4,23 @@
 #dnf install nodejs -y
 #
 #useradd roboshop
-#cp user.service /etc/systemd/system/user.service
+#cp cart.service /etc/systemd/system/cart.service
 #
 #mkdir /app
 #
-#curl -L -o /tmp/user.zip https://roboshop-artifacts.s3.amazonaws.com/user-v3.zip
+#curl -L -o /tmp/cart.zip https://roboshop-artifacts.s3.amazonaws.com/cart-v3.zip
 #cd /app
-#unzip /tmp/user.zip
+#unzip /tmp/cart.zip
 #
 #cd /app
 #npm install
 #
-#
 #systemctl daemon-reload
 #
-#systemctl enable user
-#systemctl restart user
+#systemctl enable cart
+#systemctl restart cart
 
-- name: User Setup
+- name: Cart Setup
   hosts: all
   become: true
   tasks:
@@ -46,7 +45,7 @@
 
     - name: Download and extract app content
       ansible.builtin.unarchive:
-        src: https://roboshop-artifacts.s3.amazonaws.com/user-v3.zip
+        src: https://roboshop-artifacts.s3.amazonaws.com/cart-v3.zip
         dest: /app
         remote_src: yes
 
@@ -54,14 +53,14 @@
       community.general.npm:
         path: /app
 
-    - name: Copy User service file
+    - name: Copy Cart service file
       ansible.builtin.copy:
-        src: user.service
-        dest: /etc/systemd/system/user.service
+        src: cart.service
+        dest: /etc/systemd/system/cart.service
 
-    - name: Start User service
+    - name: Start Cart service
       ansible.builtin.systemd_service:
         state: restarted
-        name: user
+        name: cart
         enabled: true
         daemon_reload: true
