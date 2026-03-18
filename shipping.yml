@@ -19,8 +19,67 @@
 #
 #mysql -h mysql-dev.saikrishna.shop -uroot -pRoboShop@1 < /app/db/schema.sql
 #mysql -h mysql-dev.saikrishna.shop -uroot -pRoboShop@1 < /app/db/app-user.sql
-#mysql -h mysql-dev.jinrikisha.shop -uroot -pRoboShop@1 < /app/db/master-data.sql
+#mysql -h mysql-dev.saikrishna.shop -uroot -pRoboShop@1 < /app/db/master-data.sql
 #
 #systemctl enable shipping
 #systemctl restart shipping
 
+- name: Shipping Setup
+  hosts: all
+  become: true
+  tasks:
+    - name: Install Maven
+      ansible.builtin.dnf:
+        name: 'maven'
+        state: present
+
+    - name: Add Roboshop Application User
+      ansible.builtin.user:
+        name: roboshop
+
+    - name: Remove app directory
+      ansible.builtin.file:
+        path: /app
+        state: absent
+
+    - name: Create app directory
+      ansible.builtin.file:
+        path: /app
+        state: directory
+
+    - name: Download and extract app content
+      ansible.builtin.unarchive:
+        src: https://roboshop-artifacts.s3.amazonaws.com/shipping-v3.zip
+        dest: /app
+        remote_src: yes
+
+    - name: Install maven dependencies
+      ansible.builtin.shell: mvn clean package ; mv target/shipping-1.0.jar shipping.jar
+      args:
+        chdir: /app/
+
+    - name: Install MySQL Client
+      ansible.builtin.dnf:
+        name: mysql
+        state: present
+
+    - name: Load Schema
+      ansible.builtin.shell: mysql -h mysql-dev.saikrishna.shop -uroot -pRoboShop@1 < /app/db/schema.sql
+
+    - name: Load app user
+      ansible.builtin.shell: mysql -h mysql-dev.saikrishna.shop -uroot -pRoboShop@1 < /app/db/app-user.sql
+
+    - name: Load master data
+      ansible.builtin.shell: mysql -h mysql-dev.saikrishna.shop -uroot -pRoboShop@1 < /app/db/master-data.sql
+
+    - name: Copy shipping service file
+      ansible.builtin.copy:
+        src: shipping.service
+        dest: /etc/systemd/system/shipping.service
+
+    - name: Start shipping service
+      ansible.builtin.systemd_service:
+        state: restarted
+        name: shipping
+        enabled: true
+        daemon_reload: true
